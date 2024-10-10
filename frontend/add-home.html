@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Home - Vacation Rentals</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">Vacation Rentals</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <button id="logout-btn" >Logout</button>
+        </div>
+    </nav>
+
+    <div class="form-container">
+        <h2>Add Home</h2>
+        <form id="add-home-form">
+            <input type="text" id="title" placeholder="Home Title" required>
+            <textarea id="description" placeholder="Home Description" required></textarea>
+            <input type="number" id="price" placeholder="Price" required>
+            <button type="submit">Add Home</button>
+        </form>
+    </div>
+
+   
+
+    <script>
+        // Logout functionality
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('token'); // Remove token from local storage
+            window.location.href = 'index.html'; // Redirect to login page
+        });
+    </script>
+</body>
+</html>

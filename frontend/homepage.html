@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Vacation Rentals</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #homes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+        }
+
+        .home-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .home-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .home-card h2 {
+            margin-top: 1rem;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .home-card p {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .home-card .price {
+            font-size: 1.2rem;
+            color: #007BFF;
+            font-weight: bold;
+        }
+
+        /* Search bar styling */
+        #search-bar {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 1rem auto;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            max-width: 600px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">Vacation Rentals</div>
+        <div class="nav-links">
+            <button id="logout-btn">Logout</button>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Welcome to the Vacation Rentals Homepage!</h1>
+        <p>You are logged in. Enjoy exploring our vacation rentals.</p>
+        
+        <!-- Search bar for filtering homes -->
+        <input type="text" id="search-bar" placeholder="Search homes by title...">
+        
+        <!-- Container for displaying homes -->
+        <div id="homes-container"></div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'login.html'; // Redirect to login if not logged in
+        }
+
+        // Logout functionality
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('token'); // Remove token from local storage
+            window.location.href = 'index.html'; // Redirect to login page
+        });
+
+        // Function to get all homes
+        let allHomes = []; // Store homes globally
+
+        async function getAllHomes() {
+            try {
+                const response = await fetch('http://localhost:3000/list-homes');
+                if (response.ok) {
+                    const data = await response.json();
+                    allHomes = data; // Store the homes in a global variable
+                    displayAllHomes(allHomes); // Display all homes on the page
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.error);
+                    window.location.href = 'homepage.html'; // Redirect to homepage on error
+                }
+            } catch (error) {
+                console.error('Error fetching homes:', error);
+                alert('Error fetching homes. Please try again.');
+            }
+        }
+
+        // Function to display homes on the page
+        function displayAllHomes(homesToDisplay) {
+            const homesContainer = document.getElementById('homes-container');
+            homesContainer.innerHTML = ''; // Clear the container
+
+            homesToDisplay.forEach((home) => {
+                const homeCard = document.createElement('div');
+                homeCard.classList.add('home-card');
+
+                const titleElement = document.createElement('h2');
+                titleElement.textContent = home.title;
+
+                const descriptionElement = document.createElement('p');
+                descriptionElement.textContent = home.description;
+
+                const priceElement = document.createElement('p');
+                priceElement.textContent = `Price: $${home.price}`;
+                priceElement.classList.add('price');
+
+                homeCard.appendChild(titleElement);
+                homeCard.appendChild(descriptionElement);
+                homeCard.appendChild(priceElement);
+
+                homesContainer.appendChild(homeCard);
+            });
+        }
+
+        // Call the function on page load if user is authenticated
+        if (localStorage.getItem('token')) {
+            getAllHomes();
+        }
+
+        // Search functionality
+        document.getElementById('search-bar').addEventListener('input', function () {
+            const searchQuery = this.value.toLowerCase();
+            const filteredHomes = allHomes.filter(home => home.title.toLowerCase().includes(searchQuery));
+            displayAllHomes(filteredHomes); // Display filtered homes
+        });
+    </script>
+</body>
+</html>
+
